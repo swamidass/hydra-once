@@ -1,4 +1,3 @@
-from ._instantiate import instantiate
+from ._instantiate import instantiate, clear_once_cache as clear
 
-__all__ = ["instantiate"]
-# This file is part of the PyTorch Lightning Bolts.
+__all__ = ["instantiate", "clear"]

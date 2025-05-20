@@ -1,0 +1,16 @@
+[project]
+name = "hydra-once"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "hydra>=2.5",
+    "hydra-core>=1.1",
+    "omegaconf>=2.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]

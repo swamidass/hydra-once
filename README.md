@@ -11,7 +11,7 @@ Sometimes, you want to ensure a subtree of your config is instantiated only **on
 ```yaml
 dataset:
   _target_: lightly.data.LightlyDataset
-  root: data_dir
+  input_dir: data_dir
 loader:
   _target_: torch.utils.data.DataLoader
   dataset: ${..dataset}  
@@ -32,7 +32,7 @@ dataset:
   _once_: true  # Only instantiate this tree once, reusing it as needed.
   # Optionally, set _once_ to a string to manually specify a cache key
   # _once_: dataset_unique_key
-  root: data_dir
+  input_dir: data_dir
 loader:
   _target_: torch.utils.data.DataLoader
   dataset: ${..dataset}  

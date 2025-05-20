@@ -444,11 +444,11 @@ an_object = object()
 _counts = {}
 
 
-def counter_function(key=None):
-    _counts[key] = _counts.get(key, 0) + 1
-    return _counts[key], key
+def counter_function(counter_key=None):
+    _counts[counter_key] = _counts.get(counter_key, 0) + 1
+    return _counts[counter_key], counter_key
 
 
-def counter_function2(key=None):
-    _counts[key] = _counts.get(key, 0) + 1
-    return _counts[key], key, "counter_function2"
+def counter_function2(counter_key=None):
+    _counts[counter_key] = _counts.get(counter_key, 0) + 1
+    return _counts[counter_key], counter_key, "counter_function2"

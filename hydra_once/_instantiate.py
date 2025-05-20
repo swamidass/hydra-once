@@ -355,27 +355,33 @@ def instantiate_node(
     elif OmegaConf.is_dict(node):
         # If _once_ is set, use the cache to store the result
         if _Keys.ONCE in node:
-            once_key = _once_hash(node, convert, recursive, partial)
-            node.pop(_Keys.ONCE)
-            if once_key not in cache:
-                cache[once_key] = instantiate_node(
-                    node,
-                    convert=convert,
-                    recursive=recursive,
-                    partial=partial,
-                    cache=cache,
-                )
-            return cache[once_key]
-
-        exclude_keys = set(
-            {"_target_", "_convert_", "_recursive_", "_partial_", "_once_"}
-        )
+            once_value = node[_Keys.ONCE]
+            # Validate _once_ type
+            if not (isinstance(once_value, (str, bool))):
+                raise InstantiationException(f"_once_ must be a string, True, or False, got {type(once_value).__name__}")
+            if once_value is not False:
+                if not _is_target(node):
+                    raise InstantiationException(f"Config with _once_ present requires _target_ key at {full_key}")
+                once_key = _once_hash(node, convert, recursive, partial)
+                node.pop(_Keys.ONCE)
+                if once_key not in cache:
+                    cache[once_key] = instantiate_node(
+                        node,
+                        convert=convert,
+                        recursive=recursive,
+                        partial=partial,
+                        cache=cache,
+                    )
+                return cache[once_key]
+            else:
+                node.pop(_Keys.ONCE)
+        # Require _target_ for any dict config that is not a container
         if _is_target(node):
             _target_ = _resolve_target(node.get(_Keys.TARGET), full_key)
             kwargs = {}
             is_partial = node.get("_partial_", False) or partial
             for key in node.keys():
-                if key not in exclude_keys:
+                if key not in {"_target_", "_convert_", "_recursive_", "_partial_", "_once_"}:
                     if OmegaConf.is_missing(node, key) and is_partial:
                         continue
                     value = node[key]

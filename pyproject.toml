@@ -1,16 +1,38 @@
 [project]
 name = "hydra-once"
 version = "0.1.0"
-description = "Add your description here"
+description = "A simple library for use with Hydra or OmegaConf configuration, enabling singleton instantiation of config subtrees."
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "hydra>=2.5",
-    "hydra-core>=1.1",
+    "hydra-core>=1.3.2",
     "omegaconf>=2.1",
 ]
+authors = [
+    { name = "S. Joshua Swamidass", email = "swamidass@gmail.com" },
+]
+license = { text = "MIT" }
+keywords = ["hydra", "omegaconf", "configuration", "singleton", "instantiation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
 
-[dependency-groups]
+[project.urls]
+Homepage = "https://github.com/swamidass/hydra-once"
+Repository = "https://github.com/swamidass/hydra-once"
+
+[project.optional-dependencies]
 dev = [
     "pytest>=8.3.5",
 ]

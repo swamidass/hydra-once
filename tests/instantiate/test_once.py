@@ -335,3 +335,83 @@ def test_once_present_and_missing_target_raises(instantiate_func):
         "some_key": 123
     }
     instantiate_func(cfg3, cache={})  # should not raise
+
+
+def test_once_with_interpolations(instantiate_func):
+    from omegaconf import OmegaConf
+    cfg = OmegaConf.create({
+        "base": {
+            "_target_": "tests.instantiate.counter_function",
+            "_once_": True,
+            "counter_key": "interp_base"
+        },
+        "ref": "${base}"
+    })
+    x = instantiate_func(cfg)
+    assert x.base == (1, "interp_base")
+    assert x.ref == (1, "interp_base")
+    y = instantiate_func(cfg)
+    assert y.base == (2, "interp_base")
+    assert y.ref == (2, "interp_base")
+
+
+def test_once_thread_safety_global_cache():
+    import threading
+    from hydra_once import instantiate, clear
+    clear()
+    cfg = {
+        "_target_": "tests.instantiate.counter_function",
+        "_once_": True,
+        "counter_key": "threadsafe"
+    }
+    results = []
+    def worker():
+        results.append(instantiate(cfg, cache=True))
+    threads = [threading.Thread(target=worker) for _ in range(10)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert all(r == results[0] for r in results)
+
+
+def test_once_manual_key_collision_warning(instantiate_func):
+    # Two different configs with the same manual _once_ key share the singleton
+    cfg1 = {
+        "_target_": "tests.instantiate.counter_function",
+        "_once_": "shared_key_collision",
+        "counter_key": "A",
+    }
+    cfg2 = {
+        "_target_": "tests.instantiate.counter_function",
+        "_once_": "shared_key_collision",
+        "counter_key": "B",
+        "extra": 123
+    }
+    cache = {}
+    result1 = instantiate_func(cfg1, cache=cache)
+    result2 = instantiate_func(cfg2, cache=cache)
+    assert result1 == result2
+    # Optionally: warn if configs differ (not implemented, just a note)
+
+
+def test_once_manual_key_unhashable(instantiate_func):
+    import hydra.errors
+    cfg = {
+        "_target_": "tests.instantiate.counter_function",
+        "_once_": {"unhashable": [1,2,3]},
+        "counter_key": "unhashable_key"
+    }
+    with pytest.raises(Exception):
+        instantiate_func(cfg, cache={})
+
+
+def test_once_missing_target_error_message(instantiate_func):
+    import hydra.errors
+    cfg = {
+        "_once_": True,
+        "counter_key": "missing_target"
+    }
+    with pytest.raises(hydra.errors.InstantiationException) as excinfo:
+        instantiate_func(cfg, cache={})
+    assert "requires _target_" in str(excinfo.value) or "_target_" in str(excinfo.value)
